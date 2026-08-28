@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>DeepSea.AI</title>
+</head>
+<body>
+    <header class="header">
+        <h1>DEEPSEA.AI</h1>
+        <nav aria-label="Main navigation">
+            <button type="button">Chat</button>
+            <button type="button">About us</button>
+        </nav>
+    </header>
+    <main class="column">
+        <h2><span class="icon" aria-hidden="true">&#10145;</span> welcome to DEEPSEA.AI</h2>
+        <p class="card">Welcome to DeepSea.AI. How can I help?</p>
+    </main>
+    <section class="chat-area" aria-label="Chat with DeepSea.AI">
+        <form class="input-box">
+            <label class="sr-only" for="question">Ask a question</label>
+            <input id="question" type="text" placeholder="Ask something..." autocomplete="off">
+            <button type="submit" aria-label="Send question">&#10145;</button>
+        </form>
+    </section>
+    <script>
+        document.querySelector('.input-box').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const input = document.querySelector('#question');
+            const question = input.value.trim();
+            if (!question) return;
+
+            const card = document.querySelector('.card');
+            card.textContent = 'Thinking...';
+            try {
+                const result = await fetch('/process', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_input: question})
+                });
+                const data = await result.json();
+                card.textContent = data.response || data.error || 'Something went wrong.';
+            } catch (error) {
+                card.textContent = 'Unable to reach the server.';
+            } finally {
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
